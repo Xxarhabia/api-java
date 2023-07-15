@@ -15,11 +15,12 @@ import static com.msara.utils.Constantes.*;
 
 public class UsuarioRepositoryImpl implements UsuarioRepository {
     private Conexion conexion;
+    String query;
 
     @Override
     public UsuarioEntity encontrarPorId(Long id) {
         UsuarioEntity usuario = null;
-        String query = SELECT_ID;
+        query = SELECT_ID;
 
         try (PreparedStatement statement = conexion.getConexion().prepareStatement(query)){
             statement.setLong(1, id);
@@ -44,7 +45,7 @@ public class UsuarioRepositoryImpl implements UsuarioRepository {
     @Override
     public List<UsuarioEntity> listarUsuario() {
         List<UsuarioEntity> listaUsuarios = new ArrayList<>();
-        String query = SELECT_USUARIOS;
+        query = SELECT_USUARIOS;
 
         try(Statement statement = conexion.getConexion().createStatement()) {
             ResultSet resultSet = statement.executeQuery(query);
@@ -68,7 +69,7 @@ public class UsuarioRepositoryImpl implements UsuarioRepository {
 
     @Override
     public void guardarUsuario(UsuarioEntity usuario) {
-        String query = INSERT_USUARIO;
+        query = INSERT_USUARIO;
 
         try(PreparedStatement statement = conexion.getConexion().prepareStatement(query)){
             statement.setString(1, usuario.getNombre());
@@ -82,7 +83,7 @@ public class UsuarioRepositoryImpl implements UsuarioRepository {
 
     @Override
     public void actualizarUsuario(UsuarioEntity usuario) {
-        String query = UPDATE_USUARIO;
+        query = UPDATE_USUARIO;
 
         try(PreparedStatement statement = conexion.getConexion().prepareStatement(query)) {
             statement.setString(1, usuario.getNombre());
@@ -98,7 +99,7 @@ public class UsuarioRepositoryImpl implements UsuarioRepository {
 
     @Override
     public void eliminarUsuario(Long id) {
-        String query = DELETE_USUARIO;
+        query = DELETE_USUARIO;
 
         try(PreparedStatement statement = conexion.getConexion().prepareStatement(query)){
             statement.setLong(1, id);
