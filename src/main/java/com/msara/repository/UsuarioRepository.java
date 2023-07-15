@@ -10,9 +10,9 @@ public interface UsuarioRepository{
 
     List<UsuarioEntity> listarUsuario();
 
-    void guardarUsuario(UsuarioEntity usuario);
+    UsuarioEntity guardarUsuario(UsuarioEntity usuario);
 
-    void actualizarUsuario(UsuarioEntity usuario);
+    UsuarioEntity actualizarUsuario(UsuarioEntity usuario);
 
     void eliminarUsuario(Long id);
 

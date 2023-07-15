@@ -8,11 +8,19 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 
 public class Socket {
-    Socket () throws IOException {
-
+    public Socket() throws IOException {
         HttpServer server = HttpServer.create(new InetSocketAddress(8000), 0);
 
-        server.createContext("/apibank", (HttpHandler) new ServicioHandler());
+        //muestra todos los usuarios
+        server.createContext("/usuarios", (HttpHandler) new ServicioHandler());
+        //muestra un usuario por id
+        server.createContext("/usuarios/{id}", (HttpHandler) new ServicioHandler());
+        //crea un usuario
+        server.createContext("/usuarios/crear", (HttpHandler) new ServicioHandler());
+        //modifica un usuario
+        server.createContext("/usuarios/modificar", (HttpHandler) new ServicioHandler());
+        //elimina un usuario mediante su id
+        server.createContext("/usuarios/eliminar/{id}", (HttpHandler) new ServicioHandler());
 
         server.setExecutor(null);
         server.start();

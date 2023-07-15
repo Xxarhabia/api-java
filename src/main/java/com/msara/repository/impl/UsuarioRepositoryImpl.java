@@ -68,7 +68,7 @@ public class UsuarioRepositoryImpl implements UsuarioRepository {
     }
 
     @Override
-    public void guardarUsuario(UsuarioEntity usuario) {
+    public UsuarioEntity guardarUsuario(UsuarioEntity usuario) {
         query = INSERT_USUARIO;
 
         try(PreparedStatement statement = conexion.getConexion().prepareStatement(query)){
@@ -79,10 +79,11 @@ public class UsuarioRepositoryImpl implements UsuarioRepository {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        return usuario;
     }
 
     @Override
-    public void actualizarUsuario(UsuarioEntity usuario) {
+    public UsuarioEntity actualizarUsuario(UsuarioEntity usuario) {
         query = UPDATE_USUARIO;
 
         try(PreparedStatement statement = conexion.getConexion().prepareStatement(query)) {
@@ -95,6 +96,7 @@ public class UsuarioRepositoryImpl implements UsuarioRepository {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        return usuario;
     }
 
     @Override
