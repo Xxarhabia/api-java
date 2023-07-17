@@ -5,7 +5,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class Conexion {
-    public Connection getConexion(){
+    public static Connection getConexion(){
 
         String url = "jdbc:sqlserver://localhost:1433;" +
                 "database=bd1;" +

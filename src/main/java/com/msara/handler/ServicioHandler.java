@@ -1,7 +1,6 @@
 package com.msara.handler;
 
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.msara.entity.UsuarioEntity;
 import com.msara.repository.impl.UsuarioRepositoryImpl;
 import com.sun.net.httpserver.HttpExchange;
@@ -13,8 +12,9 @@ import java.util.List;
 
 public class ServicioHandler implements HttpHandler {
 
-    private UsuarioRepositoryImpl inicio;
+    private UsuarioRepositoryImpl inicio = new UsuarioRepositoryImpl();
     private UsuarioEntity usuario;
+    private String path = "";
 
     @Override
     public void handle(HttpExchange he) throws IOException {
@@ -38,15 +38,15 @@ public class ServicioHandler implements HttpHandler {
 
         }
 
-        public void get(HttpExchange exchange) {
-
-            if(exchange.getRequestMethod() == "/usuarios"){
+        public void get(HttpExchange exchange) throws IOException {
+            path = exchange.getRequestURI().getPath();
+            if(path.equals("/usuarios")){
                 try {
                     List<UsuarioEntity> listaUsuarios = inicio.listarUsuario();
-                    Gson gson = new Gson();
-                    String jsonUsuarios = gson.toJson(listaUsuarios);
+                    String jsonUsuarios = new Gson().toJson(listaUsuarios);
+                    System.out.println(jsonUsuarios);
                     OutputStream out = exchange.getResponseBody();
-                    exchange.sendResponseHeaders(200, jsonUsuarios.length());
+                    exchange.sendResponseHeaders(200, jsonUsuarios.getBytes().length);
                     out.write(jsonUsuarios.getBytes());
                     out.flush();
                     out.close();
@@ -54,7 +54,7 @@ public class ServicioHandler implements HttpHandler {
                     System.out.println(e.getMessage());
                 }
             }
-            else if(exchange.getRequestMethod() == "/usuarios/{id}") {
+            else if(path.equals("/usuarios/{id}")) {
                 usuario = inicio.encontrarPorId(usuario.getId());
                 OutputStream out = exchange.getResponseBody();
             }

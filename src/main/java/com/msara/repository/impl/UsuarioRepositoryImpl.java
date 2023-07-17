@@ -11,6 +11,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.msara.connection.Conexion.getConexion;
 import static com.msara.utils.Constantes.*;
 
 public class UsuarioRepositoryImpl implements UsuarioRepository {
@@ -22,7 +23,7 @@ public class UsuarioRepositoryImpl implements UsuarioRepository {
         UsuarioEntity usuario = null;
         query = SELECT_ID;
 
-        try (PreparedStatement statement = conexion.getConexion().prepareStatement(query)){
+        try (PreparedStatement statement = getConexion().prepareStatement(query)){
             statement.setLong(1, id);
             ResultSet resultSet = statement.executeQuery();
 
@@ -47,8 +48,8 @@ public class UsuarioRepositoryImpl implements UsuarioRepository {
         List<UsuarioEntity> listaUsuarios = new ArrayList<>();
         query = SELECT_USUARIOS;
 
-        try(Statement statement = conexion.getConexion().createStatement()) {
-            ResultSet resultSet = statement.executeQuery(query);
+        try(PreparedStatement statement = getConexion().prepareStatement(query)) {
+            ResultSet resultSet = statement.executeQuery();
 
             while(resultSet.next()) {
                 UsuarioEntity usuario = new UsuarioEntity();
@@ -61,7 +62,7 @@ public class UsuarioRepositoryImpl implements UsuarioRepository {
             }
 
         }catch (SQLException e) {
-            e.printStackTrace();
+            System.out.println(e.getMessage());
         }
 
         return listaUsuarios;
@@ -71,7 +72,7 @@ public class UsuarioRepositoryImpl implements UsuarioRepository {
     public UsuarioEntity guardarUsuario(UsuarioEntity usuario) {
         query = INSERT_USUARIO;
 
-        try(PreparedStatement statement = conexion.getConexion().prepareStatement(query)){
+        try(PreparedStatement statement = getConexion().prepareStatement(query)){
             statement.setString(1, usuario.getNombre());
             statement.setString(2, usuario.getApellido());
             statement.setInt(3, usuario.getEdad());
@@ -86,7 +87,7 @@ public class UsuarioRepositoryImpl implements UsuarioRepository {
     public UsuarioEntity actualizarUsuario(UsuarioEntity usuario) {
         query = UPDATE_USUARIO;
 
-        try(PreparedStatement statement = conexion.getConexion().prepareStatement(query)) {
+        try(PreparedStatement statement = getConexion().prepareStatement(query)) {
             statement.setString(1, usuario.getNombre());
             statement.setString(2, usuario.getApellido());
             statement.setInt(3, usuario.getEdad());
@@ -103,7 +104,7 @@ public class UsuarioRepositoryImpl implements UsuarioRepository {
     public void eliminarUsuario(Long id) {
         query = DELETE_USUARIO;
 
-        try(PreparedStatement statement = conexion.getConexion().prepareStatement(query)){
+        try(PreparedStatement statement = getConexion().prepareStatement(query)){
             statement.setLong(1, id);
             statement.executeUpdate();
         } catch (SQLException e) {
