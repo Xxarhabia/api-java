@@ -1,6 +1,7 @@
 package com.msara.connection;
 
 import com.msara.handler.ServicioHandler;
+import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
 
@@ -9,7 +10,7 @@ import java.net.InetSocketAddress;
 
 public class Socket {
     public Socket() throws IOException {
-        HttpServer server = HttpServer.create(new InetSocketAddress(8000), 0);
+        HttpServer server = HttpServer.create(new InetSocketAddress("localhost",8000), 0);
 
         //muestra todos los usuarios
         server.createContext("/usuarios", (HttpHandler) new ServicioHandler());
