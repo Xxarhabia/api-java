@@ -15,13 +15,13 @@ public class Socket {
         //muestra todos los usuarios
         server.createContext("/usuarios", (HttpHandler) new ServicioHandler());
         //muestra un usuario por id
-        server.createContext("/usuarios/{id}", (HttpHandler) new ServicioHandler());
+        server.createContext("/usuarios/id", (HttpHandler) new ServicioHandler());
         //crea un usuario
         server.createContext("/usuarios/crear", (HttpHandler) new ServicioHandler());
         //modifica un usuario
         server.createContext("/usuarios/modificar", (HttpHandler) new ServicioHandler());
         //elimina un usuario mediante su id
-        server.createContext("/usuarios/eliminar/{id}", (HttpHandler) new ServicioHandler());
+        server.createContext("/usuarios/eliminar/id", (HttpHandler) new ServicioHandler());
 
         server.setExecutor(null);
         server.start();

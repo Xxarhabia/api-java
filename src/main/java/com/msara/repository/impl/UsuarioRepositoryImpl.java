@@ -35,7 +35,6 @@ public class UsuarioRepositoryImpl implements UsuarioRepository {
                 usuario.setEdad(resultSet.getInt("edad"));
                 usuario.setTelefono(resultSet.getString("telefono"));
             }
-
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -55,30 +54,36 @@ public class UsuarioRepositoryImpl implements UsuarioRepository {
                 UsuarioEntity usuario = new UsuarioEntity();
                 usuario.setId(resultSet.getLong("id"));
                 usuario.setNombre(resultSet.getString("nombre"));
-                usuario.setNombre(resultSet.getString("apellido"));
+                usuario.setApellido(resultSet.getString("apellido"));
                 usuario.setEdad(resultSet.getInt("edad"));
                 usuario.setTelefono(resultSet.getString("telefono"));
                 listaUsuarios.add(usuario);
             }
-
         }catch (SQLException e) {
             System.out.println(e.getMessage());
         }
-
         return listaUsuarios;
     }
 
     @Override
     public UsuarioEntity guardarUsuario(UsuarioEntity usuario) {
         query = INSERT_USUARIO;
-
         try(PreparedStatement statement = getConexion().prepareStatement(query)){
             statement.setString(1, usuario.getNombre());
             statement.setString(2, usuario.getApellido());
             statement.setInt(3, usuario.getEdad());
             statement.setString(4, usuario.getTelefono());
+
+            int filasAfectadas = statement.executeUpdate();
+
+            if(filasAfectadas > 0){
+                System.out.println("Insercion exitosa");
+            } else {
+                System.out.println("No se insertaron filas");
+            }
+
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.out.println(e.getMessage());
         }
         return usuario;
     }
