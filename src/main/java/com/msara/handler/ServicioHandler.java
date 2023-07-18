@@ -6,10 +6,13 @@ import com.msara.entity.UsuarioEntity;
 import com.msara.repository.impl.UsuarioRepositoryImpl;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
+import com.sun.org.apache.xerces.internal.impl.xpath.regex.Match;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class ServicioHandler implements HttpHandler {
 
@@ -51,11 +54,33 @@ public class ServicioHandler implements HttpHandler {
                     out.flush();
                     out.close();
                 } catch (IOException e) {
-                    System.out.println(e.getMessage());
+                    String respuesta = "Error al listar los usuarios";
+                    exchange.sendResponseHeaders(404, respuesta.length());
+                    OutputStream out = exchange.getResponseBody();
+                    out.write(respuesta.getBytes());
+                    out.flush();
+                    out.close();
                 }
             }
-            else if(path.equals("/usuarios/id")) {
+            else if(path.startsWith("/usuario/")) {
+                try {
+                    long idPath = obtenerIdPath(path);
+                    usuario = inicio.encontrarPorId(idPath);
+                    String jsonUsuairo = new Gson().toJson(usuario);
+                    OutputStream out = exchange.getResponseBody();
+                    exchange.sendResponseHeaders(200, jsonUsuairo.length());
+                    out.write(jsonUsuairo.getBytes());
+                    out.flush();
+                    out.close();
 
+                } catch (IOException e) {
+                    String respuesta = "Error en la solicitud";
+                    exchange.sendResponseHeaders(500, respuesta.length());
+                    OutputStream out = exchange.getResponseBody();
+                    out.write(respuesta.getBytes());
+                    out.flush();
+                    out.close();
+                }
             }
         }
 
@@ -102,6 +127,18 @@ public class ServicioHandler implements HttpHandler {
 
         public void delete(HttpExchange exchange) {
             inicio.eliminarUsuario(usuario.getId());
+        }
+
+        //Con este metodo obtenemos el path id del usuario
+        private long obtenerIdPath(String path){
+            Pattern pattern = Pattern.compile("/usuario/(\\d+)");
+            Matcher matcher = pattern.matcher(path);
+
+            if(matcher.find()){
+                String idString = matcher.group(1);
+                return Long.parseLong(idString);
+            }
+            return -1;
         }
     }
 
