@@ -14,14 +14,12 @@ public class Socket {
 
         //muestra todos los usuarios
         server.createContext("/usuarios", (HttpHandler) new ServicioHandler());
-        //muestra un usuario por id
+
+        //muestra un usuario por id, para modificar y para eliminar
         server.createContext("/usuario", (HttpHandler) new ServicioHandler());
+
         //crea un usuario
         server.createContext("/usuarios/crear", (HttpHandler) new ServicioHandler());
-        //modifica un usuario
-        server.createContext("/usuarios/modificar", (HttpHandler) new ServicioHandler());
-        //elimina un usuario mediante su id
-        server.createContext("/usuarios/eliminar", (HttpHandler) new ServicioHandler());
 
         server.setExecutor(null);
         server.start();

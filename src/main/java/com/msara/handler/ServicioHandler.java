@@ -6,7 +6,6 @@ import com.msara.entity.UsuarioEntity;
 import com.msara.repository.impl.UsuarioRepositoryImpl;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
-import com.sun.org.apache.xerces.internal.impl.xpath.regex.Match;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -72,7 +71,6 @@ public class ServicioHandler implements HttpHandler {
                     out.write(jsonUsuairo.getBytes());
                     out.flush();
                     out.close();
-
                 } catch (IOException e) {
                     String respuesta = "Error en la solicitud";
                     exchange.sendResponseHeaders(500, respuesta.length());
@@ -121,12 +119,58 @@ public class ServicioHandler implements HttpHandler {
             }
         }
 
-        public void put(HttpExchange exchange) {
-            usuario = inicio.actualizarUsuario(usuario);
+        public void put(HttpExchange exchange) throws IOException {
+            path = exchange.getRequestURI().getPath();
+            if(path.startsWith("/usuario/")){
+                try {
+                    long idPath = obtenerIdPath(path);
+
+                    InputStreamReader isr = new InputStreamReader(exchange.getRequestBody(), StandardCharsets.UTF_8);
+                    BufferedReader br = new BufferedReader(isr);
+                    StringBuilder jsonBuilder = new StringBuilder();
+                    String linea;
+
+                    while ((linea = br.readLine()) != null){
+                        jsonBuilder.append(linea);
+                    }
+
+                    String json = jsonBuilder.toString();
+
+                    Gson gson = new Gson();
+                    usuario = gson.fromJson(json, UsuarioEntity.class);
+                    usuario.setId(idPath);
+                    inicio.actualizarUsuario(usuario);
+
+                    String respuesta = "Usuario actualizado correctamente";
+                    exchange.sendResponseHeaders(200, respuesta.length());
+                    OutputStream out = exchange.getResponseBody();
+                    out.write(respuesta.getBytes());
+                    out.flush();
+                    out.close();
+                } catch (JsonSyntaxException e) {
+                    String respuesta = "Error en el formato del JSON";
+                    exchange.sendResponseHeaders(400, respuesta.length());
+                    OutputStream out = exchange.getResponseBody();
+                    out.write(respuesta.getBytes());
+                    out.flush();
+                    out.close();
+                }
+            }
         }
 
-        public void delete(HttpExchange exchange) {
-            inicio.eliminarUsuario(usuario.getId());
+        public void delete(HttpExchange exchange) throws IOException {
+            path = exchange.getRequestURI().getPath();
+            if(path.startsWith("/usuario/")){
+                long idPath = obtenerIdPath(path);
+                inicio.eliminarUsuario(idPath);
+
+                String respuesta = "El usuario fue eliminado correctamente";
+                exchange.sendResponseHeaders(200, respuesta.length());
+                OutputStream out = exchange.getResponseBody();
+                out.write(respuesta.getBytes());
+                out.flush();
+                out.close();
+            }
         }
 
         //Con este metodo obtenemos el path id del usuario
