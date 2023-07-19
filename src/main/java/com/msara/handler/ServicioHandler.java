@@ -47,18 +47,13 @@ public class ServicioHandler implements HttpHandler {
                 try {
                     List<UsuarioEntity> listaUsuarios = inicio.listarUsuario();
                     String jsonUsuarios = new Gson().toJson(listaUsuarios);
-                    OutputStream out = exchange.getResponseBody();
+
                     exchange.sendResponseHeaders(200, jsonUsuarios.length());
-                    out.write(jsonUsuarios.getBytes());
-                    out.flush();
-                    out.close();
+                    out(jsonUsuarios, exchange);
                 } catch (IOException e) {
                     String respuesta = "Error al listar los usuarios";
                     exchange.sendResponseHeaders(404, respuesta.length());
-                    OutputStream out = exchange.getResponseBody();
-                    out.write(respuesta.getBytes());
-                    out.flush();
-                    out.close();
+                    out(respuesta, exchange);
                 }
             }
             else if(path.startsWith("/usuario/")) {
@@ -66,18 +61,12 @@ public class ServicioHandler implements HttpHandler {
                     long idPath = obtenerIdPath(path);
                     usuario = inicio.encontrarPorId(idPath);
                     String jsonUsuairo = new Gson().toJson(usuario);
-                    OutputStream out = exchange.getResponseBody();
                     exchange.sendResponseHeaders(200, jsonUsuairo.length());
-                    out.write(jsonUsuairo.getBytes());
-                    out.flush();
-                    out.close();
+                    out(jsonUsuairo, exchange);
                 } catch (IOException e) {
                     String respuesta = "Error en la solicitud";
                     exchange.sendResponseHeaders(500, respuesta.length());
-                    OutputStream out = exchange.getResponseBody();
-                    out.write(respuesta.getBytes());
-                    out.flush();
-                    out.close();
+                    out(respuesta, exchange);
                 }
             }
         }
@@ -86,16 +75,7 @@ public class ServicioHandler implements HttpHandler {
             path = exchange.getRequestURI().getPath();
             if(path.equals("/usuarios/crear")){
                 try {
-                    InputStreamReader isr = new InputStreamReader(exchange.getRequestBody(), StandardCharsets.UTF_8);
-                    BufferedReader br = new BufferedReader(isr);
-                    StringBuilder jsonBuilder = new StringBuilder();
-                    String linea;
-
-                    while ((linea = br.readLine()) != null){
-                        jsonBuilder.append(linea);
-                    }
-
-                    String json = jsonBuilder.toString();
+                    String json = jsonToString(exchange);
 
                     Gson gson = new Gson();
                     usuario = gson.fromJson(json, UsuarioEntity.class);
@@ -105,16 +85,11 @@ public class ServicioHandler implements HttpHandler {
                     String respuesta = "Usuarios agregado correctamente";
                     exchange.sendResponseHeaders(200, respuesta.length());
                     OutputStream out = exchange.getResponseBody();
-                    out.write(respuesta.getBytes());
-                    out.flush();
-                    out.close();
+                    out(respuesta, exchange);
                 } catch (JsonSyntaxException e) {
                     String respuesta = "Error en el formato del JSON";
                     exchange.sendResponseHeaders(400, respuesta.length());
-                    OutputStream out = exchange.getResponseBody();
-                    out.write(respuesta.getBytes());
-                    out.flush();
-                    out.close();
+                    out(respuesta, exchange);
                 }
             }
         }
@@ -125,35 +100,20 @@ public class ServicioHandler implements HttpHandler {
                 try {
                     long idPath = obtenerIdPath(path);
 
-                    InputStreamReader isr = new InputStreamReader(exchange.getRequestBody(), StandardCharsets.UTF_8);
-                    BufferedReader br = new BufferedReader(isr);
-                    StringBuilder jsonBuilder = new StringBuilder();
-                    String linea;
-
-                    while ((linea = br.readLine()) != null){
-                        jsonBuilder.append(linea);
-                    }
-
-                    String json = jsonBuilder.toString();
+                    String jsonString = jsonToString(exchange);
 
                     Gson gson = new Gson();
-                    usuario = gson.fromJson(json, UsuarioEntity.class);
+                    usuario = gson.fromJson(jsonString, UsuarioEntity.class);
                     usuario.setId(idPath);
                     inicio.actualizarUsuario(usuario);
 
                     String respuesta = "Usuario actualizado correctamente";
                     exchange.sendResponseHeaders(200, respuesta.length());
-                    OutputStream out = exchange.getResponseBody();
-                    out.write(respuesta.getBytes());
-                    out.flush();
-                    out.close();
+                    out(respuesta, exchange);
                 } catch (JsonSyntaxException e) {
                     String respuesta = "Error en el formato del JSON";
                     exchange.sendResponseHeaders(400, respuesta.length());
-                    OutputStream out = exchange.getResponseBody();
-                    out.write(respuesta.getBytes());
-                    out.flush();
-                    out.close();
+                    out(respuesta, exchange);
                 }
             }
         }
@@ -166,14 +126,10 @@ public class ServicioHandler implements HttpHandler {
 
                 String respuesta = "El usuario fue eliminado correctamente";
                 exchange.sendResponseHeaders(200, respuesta.length());
-                OutputStream out = exchange.getResponseBody();
-                out.write(respuesta.getBytes());
-                out.flush();
-                out.close();
+                out(respuesta, exchange);
             }
         }
 
-        //Con este metodo obtenemos el path id del usuario
         private long obtenerIdPath(String path){
             Pattern pattern = Pattern.compile("/usuario/(\\d+)");
             Matcher matcher = pattern.matcher(path);
@@ -184,5 +140,34 @@ public class ServicioHandler implements HttpHandler {
             }
             return -1;
         }
-    }
 
+        private void out(String respuesta, HttpExchange exchange){
+            try {
+                OutputStream out = exchange.getResponseBody();
+                out.write(respuesta.getBytes());
+                out.flush();
+                out.close();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        private String jsonToString(HttpExchange exchange){
+            try{
+                InputStreamReader isr = new InputStreamReader(exchange.getRequestBody(), StandardCharsets.UTF_8);
+                BufferedReader br = new BufferedReader(isr);
+                StringBuilder jsonBuilder = new StringBuilder();
+                String linea;
+
+                while((linea = br.readLine()) != null){
+                    jsonBuilder.append(linea);
+                }
+
+                String json = jsonBuilder.toString();
+                return json;
+
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
