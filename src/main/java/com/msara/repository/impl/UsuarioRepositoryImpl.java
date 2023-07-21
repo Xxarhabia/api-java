@@ -65,6 +65,19 @@ public class UsuarioRepositoryImpl implements UsuarioRepository {
 
     @Override
     public UsuarioEntity guardarUsuario(UsuarioEntity usuario) {
+
+        if (usuario.getNombre() == null || usuario.getNombre().isEmpty()) {
+            return null;
+        }
+
+        if (usuario.getApellido() == null || usuario.getApellido().isEmpty()) {
+            return null;
+        }
+
+        if (usuario.getEdad() <= 0) {
+            return null;
+        }
+
         query = INSERT_USUARIO;
         try(PreparedStatement statement = getConexion().prepareStatement(query)){
             statement.setString(1, usuario.getNombre());
@@ -88,6 +101,19 @@ public class UsuarioRepositoryImpl implements UsuarioRepository {
 
     @Override
     public UsuarioEntity actualizarUsuario(UsuarioEntity usuario) {
+
+        if (usuario.getNombre() == null || usuario.getNombre().isEmpty()) {
+            return null;
+        }
+
+        if (usuario.getApellido() == null || usuario.getApellido().isEmpty()) {
+            return null;
+        }
+
+        if (usuario.getEdad() <= 0) {
+            return null;
+        }
+
         query = UPDATE_USUARIO;
 
         try(PreparedStatement statement = getConexion().prepareStatement(query)) {
@@ -114,4 +140,6 @@ public class UsuarioRepositoryImpl implements UsuarioRepository {
             e.printStackTrace();
         }
     }
+
+
 }

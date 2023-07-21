@@ -6,12 +6,14 @@ import com.msara.entity.UsuarioEntity;
 import com.msara.repository.impl.UsuarioRepositoryImpl;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
+import org.apache.log4j.Logger;
 
 import java.io.*;
 import java.util.List;
 
 public class ServicioHandler implements HttpHandler {
 
+    private static final Logger log = Logger.getLogger(ServicioHandler.class);
     private final UsuarioRepositoryImpl repository = new UsuarioRepositoryImpl();
     private UsuarioEntity usuario = new UsuarioEntity();
     private final Metodos metodo = new Metodos();
@@ -44,11 +46,11 @@ public class ServicioHandler implements HttpHandler {
             try {
                 List<UsuarioEntity> listaUsuarios = repository.listarUsuario();
                 String jsonUsuarios = new Gson().toJson(listaUsuarios);
-
                 exchange.sendResponseHeaders(200, jsonUsuarios.length());
                 metodo.out(jsonUsuarios, exchange);
             } catch (IOException e) {
                 String respuesta = "Error al listar los usuarios";
+                log.error(respuesta);
                 exchange.sendResponseHeaders(404, respuesta.length());
                 metodo.out(respuesta, exchange);
             }
@@ -62,6 +64,7 @@ public class ServicioHandler implements HttpHandler {
                 metodo.out(jsonUsuairo, exchange);
             } catch (IOException e) {
                 String respuesta = "Error en la solicitud";
+                log.error(respuesta);
                 exchange.sendResponseHeaders(500, respuesta.length());
                 metodo.out(respuesta, exchange);
             }
@@ -79,12 +82,25 @@ public class ServicioHandler implements HttpHandler {
 
                 repository.guardarUsuario(usuario);
 
-                String respuesta = "Usuarios agregado correctamente";
-                exchange.sendResponseHeaders(200, respuesta.length());
-                OutputStream out = exchange.getResponseBody();
-                metodo.out(respuesta, exchange);
+                if(usuario.getNombre().isEmpty() ||
+                        usuario.getApellido().isEmpty() ||
+                        usuario.getEdad() <= 0){
+                    String respuesta = "Hay un error en los datos";
+                    log.error(respuesta);
+                    exchange.sendResponseHeaders(400, respuesta.length());
+                    OutputStream out = exchange.getResponseBody();
+                    metodo.out(respuesta, exchange);
+                } else {
+                    String respuesta = "Usuarios agregado correctamente";
+                    log.info(respuesta);
+                    exchange.sendResponseHeaders(200, respuesta.length());
+                    OutputStream out = exchange.getResponseBody();
+                    metodo.out(respuesta, exchange);
+                }
+
             } catch (JsonSyntaxException e) {
                 String respuesta = "Error en el formato del JSON";
+                log.error(respuesta);
                 exchange.sendResponseHeaders(400, respuesta.length());
                 metodo.out(respuesta, exchange);
             }
@@ -104,11 +120,24 @@ public class ServicioHandler implements HttpHandler {
                 usuario.setId(idPath);
                 repository.actualizarUsuario(usuario);
 
-                String respuesta = "Usuario actualizado correctamente";
-                exchange.sendResponseHeaders(200, respuesta.length());
-                metodo.out(respuesta, exchange);
+                if(usuario.getNombre().isEmpty() ||
+                        usuario.getApellido().isEmpty() ||
+                        usuario.getEdad() <= 0){
+
+                    String respuesta = "Hay un error en los datos";
+                    log.error(respuesta);
+                    exchange.sendResponseHeaders(400, respuesta.length());
+                    metodo.out(respuesta, exchange);
+                } else {
+                    String respuesta = "Usuario actualizado correctamente";
+                    log.info(respuesta);
+                    exchange.sendResponseHeaders(200, respuesta.length());
+                    metodo.out(respuesta, exchange);
+                }
+
             } catch (JsonSyntaxException e) {
                 String respuesta = "Error en el formato del JSON";
+                log.error(respuesta);
                 exchange.sendResponseHeaders(400, respuesta.length());
                 metodo.out(respuesta, exchange);
             }
@@ -122,6 +151,7 @@ public class ServicioHandler implements HttpHandler {
             repository.eliminarUsuario(idPath);
 
             String respuesta = "El usuario fue eliminado correctamente";
+            log.info(respuesta);
             exchange.sendResponseHeaders(200, respuesta.length());
             metodo.out(respuesta, exchange);
         }
