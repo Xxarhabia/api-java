@@ -78,14 +78,7 @@ public class UsuarioRepositoryImpl implements UsuarioRepository {
             statement.setString(2, usuario.getApellido());
             statement.setInt(3, usuario.getEdad());
             statement.setString(4, usuario.getTelefono());
-
-            int filasAfectadas = statement.executeUpdate();
-
-            if(filasAfectadas > 0){
-                System.out.println("Insercion exitosa");
-            } else {
-                System.out.println("No se insertaron filas");
-            }
+            statement.executeUpdate();
 
         } catch (SQLException e) {
             System.out.println(e.getMessage());
