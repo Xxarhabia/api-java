@@ -27,20 +27,22 @@ public final class Variables {
     public String errorBadList(){
         return properties.getProperty("ERROR_BAD_LIST");
     }
-
     public String errorBadRequest(){
         return properties.getProperty("ERROR_BAD_REQUEST");
     }
-
     public String errorBadData(){
         return properties.getProperty("ERROR_BAD_DATA");
     }
-
     public String errorBadJsonFormat(){
         return properties.getProperty("ERROR_BAD_JSON_FORMAT");
     }
 
-    public String okSuccessfulRequest(){
-        return properties.getProperty("OK_SUCCESSFUL_REQUEST");
+
+    public String okSuccessfulInsert(){
+        return properties.getProperty("OK_SUCCESSFUL_INSERT");
+    }
+    public String okSuccessfulUpdate() { return properties.getProperty("OK_SUCCESSFUL_UPDATE"); }
+    public String okSuccessfulDelete(){
+        return properties.getProperty("OK_SUCCESSFUL_DELETE");
     }
 }
